@@ -9,6 +9,8 @@ const STORAGE_KEYS = {
     DISCORD_TOKEN: 'discord_token'
 };
 
+const ADMIN_DISCORD_IDS = ['715175664193372171'];
+
 let products = [];
 let config = {};
 let isAdminMode = false;
@@ -20,7 +22,6 @@ let isAdminMode = false;
 const DISCORD_OAUTH = {
     clientId: '1462789095787855914',
     redirectUri: 'https://plork.store',
-    adminIds: ['715175664193372171'],
     scopes: ['identify']
 };
 
@@ -36,18 +37,40 @@ document.addEventListener('DOMContentLoaded', () => {
     bindUI();
     handleDiscordCallback();
     restoreDiscordSession();
+    checkAdminAccess();
 });
+
+/* =========================
+   ADMIN ACCESS CONTROL
+========================= */
+
+function checkAdminAccess() {
+    const settingsBtn = document.querySelector('.settings-toggle');
+    const adminBtn = document.getElementById('adminBtn');
+    const user = JSON.parse(localStorage.getItem(STORAGE_KEYS.DISCORD_USER));
+
+    if (settingsBtn) settingsBtn.style.display = 'none';
+    if (adminBtn) adminBtn.style.display = 'none';
+
+    if (!user) return;
+
+    if (ADMIN_DISCORD_IDS.includes(user.id)) {
+        if (settingsBtn) settingsBtn.style.display = 'inline-flex';
+        if (adminBtn) adminBtn.style.display = 'inline-flex';
+        isAdminMode = true;
+    }
+}
 
 /* =========================
    UI BINDINGS
 ========================= */
 
 function bindUI() {
-    const settingsBtn = document.querySelector('.settings-toggle');
-    if (settingsBtn) settingsBtn.addEventListener('click', openSettings);
+    document.querySelector('.settings-toggle')
+        ?.addEventListener('click', openSettings);
 
-    const productForm = document.getElementById('productForm');
-    if (productForm) productForm.addEventListener('submit', handleProductSubmit);
+    document.getElementById('productForm')
+        ?.addEventListener('submit', handleProductSubmit);
 }
 
 /* =========================
@@ -55,18 +78,19 @@ function bindUI() {
 ========================= */
 
 function openSettings() {
-    document.getElementById('settingsModal')?.classList.add('active');
+    if (!isAdminMode) {
+        notify('Access denied', true);
+        return;
+    }
+    document.getElementById('settingsModal').classList.add('active');
 }
 
 function closeSettings() {
-    document.getElementById('settingsModal')?.classList.remove('active');
+    document.getElementById('settingsModal').classList.remove('active');
 }
 
 function saveSettings() {
     config = {
-        discordAuth: {
-            enabled: document.getElementById('discordAuthEnabled')?.checked || false
-        },
         discordWebhook: {
             enabled: document.getElementById('discordEnabled')?.checked || false,
             url: document.getElementById('discordWebhook')?.value || ''
@@ -90,10 +114,8 @@ function saveSettings() {
 function loadConfig() {
     const saved = localStorage.getItem(STORAGE_KEYS.CONFIG);
     if (!saved) return;
-
     config = JSON.parse(saved);
 
-    document.getElementById('discordAuthEnabled').checked = config.discordAuth?.enabled || false;
     document.getElementById('discordEnabled').checked = config.discordWebhook?.enabled || false;
     document.getElementById('discordWebhook').value = config.discordWebhook?.url || '';
     document.getElementById('telegramEnabled').checked = config.telegram?.enabled || false;
@@ -102,8 +124,7 @@ function loadConfig() {
 }
 
 function loadProducts() {
-    const saved = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-    products = saved ? JSON.parse(saved) : [];
+    products = JSON.parse(localStorage.getItem(STORAGE_KEYS.PRODUCTS) || '[]');
 }
 
 /* =========================
@@ -112,7 +133,7 @@ function loadProducts() {
 
 function handleProductSubmit(e) {
     e.preventDefault();
-    if (!isAdminMode) return notify('Admin access required', true);
+    if (!isAdminMode) return notify('Admin only', true);
 
     const product = {
         id: Date.now(),
@@ -133,8 +154,6 @@ function handleProductSubmit(e) {
 function renderProducts() {
     const grid = document.getElementById('productsGrid');
     const empty = document.getElementById('emptyState');
-    if (!grid) return;
-
     grid.innerHTML = '';
 
     if (!products.length) {
@@ -145,20 +164,19 @@ function renderProducts() {
     empty.style.display = 'none';
 
     products.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-            <img src="${p.image || ''}" onerror="this.style.display='none'">
-            <div class="product-content">
-                <span class="product-category">${p.category}</span>
-                <h3>${p.name}</h3>
-                <p>${p.description}</p>
-                <div class="product-footer">
-                    <span class="price">$${p.price.toFixed(2)}</span>
+        grid.innerHTML += `
+            <div class="product-card">
+                <img src="${p.image || ''}" onerror="this.style.display='none'">
+                <div class="product-content">
+                    <span class="product-category">${p.category}</span>
+                    <h3>${p.name}</h3>
+                    <p>${p.description}</p>
+                    <div class="product-footer">
+                        <span class="price">$${p.price.toFixed(2)}</span>
+                    </div>
                 </div>
             </div>
         `;
-        grid.appendChild(card);
     });
 }
 
@@ -167,13 +185,9 @@ function renderProducts() {
 ========================= */
 
 function setupImagePreview() {
-    const input = document.getElementById('productImage');
-    const preview = document.getElementById('imagePreview');
-    if (!input || !preview) return;
-
-    input.addEventListener('input', () => {
-        preview.innerHTML = input.value
-            ? `<img src="${input.value}" onerror="this.remove()">`
+    productImage?.addEventListener('input', () => {
+        imagePreview.innerHTML = productImage.value
+            ? `<img src="${productImage.value}" onerror="this.remove()">`
             : `<div class="image-preview-placeholder">📦</div>`;
     });
 }
@@ -184,59 +198,14 @@ function setupImagePreview() {
 
 function notify(msg, error = false) {
     const n = document.createElement('div');
-    n.className = 'notification' + (error ? ' error' : '');
+    n.className = `notification${error ? ' error' : ''}`;
     n.textContent = msg;
     document.body.appendChild(n);
-
-    setTimeout(() => {
-        n.style.opacity = '0';
-        setTimeout(() => n.remove(), 300);
-    }, 3000);
+    setTimeout(() => n.remove(), 3000);
 }
 
 /* =========================
-   DISCORD + TELEGRAM
-========================= */
-
-function sendNotifications(action, product) {
-    if (config.discordWebhook?.enabled) sendDiscord(action, product);
-    if (config.telegram?.enabled) sendTelegram(action, product);
-}
-
-function sendDiscord(action, product) {
-    if (!config.discordWebhook?.url) return;
-
-    fetch(config.discordWebhook.url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            embeds: [{
-                title: `Product ${action}`,
-                fields: [
-                    { name: 'Name', value: product.name, inline: true },
-                    { name: 'Category', value: product.category, inline: true },
-                    { name: 'Price', value: `$${product.price.toFixed(2)}` }
-                ]
-            }]
-        })
-    });
-}
-
-function sendTelegram(action, product) {
-    if (!config.telegram.botToken || !config.telegram.chatId) return;
-
-    fetch(`https://api.telegram.org/bot${config.telegram.botToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            chat_id: config.telegram.chatId,
-            text: `Product ${action}\n${product.name} - $${product.price}`
-        })
-    });
-}
-
-/* =========================
-   DISCORD OAUTH (PKCE)
+   DISCORD LOGIN (PKCE)
 ========================= */
 
 async function loginWithDiscord() {
@@ -257,21 +226,17 @@ async function loginWithDiscord() {
         code_challenge_method: 'S256'
     });
 
-    window.location.href =
-        `https://discord.com/oauth2/authorize?${params.toString()}`;
+    location.href = `https://discord.com/oauth2/authorize?${params}`;
 }
 
 function handleDiscordCallback() {
-    const qs = new URLSearchParams(window.location.search);
+    const qs = new URLSearchParams(location.search);
     const code = qs.get('code');
     const state = qs.get('state');
     if (!code) return;
 
-    const savedState = sessionStorage.getItem('discord_state');
-    const verifier = sessionStorage.getItem('discord_verifier');
-    if (state !== savedState) return notify('Invalid Discord login', true);
-
-    exchangeDiscordCode(code, verifier);
+    if (state !== sessionStorage.getItem('discord_state')) return;
+    exchangeDiscordCode(code, sessionStorage.getItem('discord_verifier'));
 }
 
 async function exchangeDiscordCode(code, verifier) {
@@ -290,13 +255,12 @@ async function exchangeDiscordCode(code, verifier) {
     });
 
     const token = await res.json();
-    localStorage.setItem(STORAGE_KEYS.DISCORD_TOKEN, JSON.stringify(token));
     fetchDiscordUser(token.access_token);
 }
 
-async function fetchDiscordUser(accessToken) {
+async function fetchDiscordUser(token) {
     const res = await fetch('https://discord.com/api/users/@me', {
-        headers: { Authorization: `Bearer ${accessToken}` }
+        headers: { Authorization: `Bearer ${token}` }
     });
 
     const user = await res.json();
@@ -311,19 +275,16 @@ function restoreDiscordSession() {
 }
 
 function applyDiscordSession(user) {
-    document.getElementById('loginBtn').style.display = 'none';
-    document.getElementById('userInfo').style.display = 'flex';
-    document.getElementById('userName').textContent = user.username;
-    document.getElementById('userAvatar').src =
-        `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
-
-    if (DISCORD_OAUTH.adminIds.includes(user.id)) {
-        document.getElementById('adminBtn').style.display = 'inline-block';
-        isAdminMode = true;
-        document.body.classList.add('admin-mode');
-        notify('Admin access granted');
-    }
+    loginBtn.style.display = 'none';
+    userInfo.style.display = 'flex';
+    userName.textContent = user.username;
+    userAvatar.src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+    checkAdminAccess();
 }
+
+/* =========================
+   LOGOUT
+========================= */
 
 function logout() {
     localStorage.clear();
@@ -336,19 +297,12 @@ function logout() {
 ========================= */
 
 function generateCodeVerifier() {
-    const array = new Uint8Array(32);
-    crypto.getRandomValues(array);
-    return btoa(String.fromCharCode(...array))
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
+    return crypto.getRandomValues(new Uint8Array(32))
+        .reduce((s, b) => s + String.fromCharCode(b), '');
 }
 
-async function generateCodeChallenge(verifier) {
-    const data = new TextEncoder().encode(verifier);
-    const digest = await crypto.subtle.digest('SHA-256', data);
-    return btoa(String.fromCharCode(...new Uint8Array(digest)))
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
+async function generateCodeChallenge(v) {
+    const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
+    return btoa(String.fromCharCode(...new Uint8Array(d)))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
