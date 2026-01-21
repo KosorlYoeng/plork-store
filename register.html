@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Marketplace</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body>
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <a href="index.html" class="auth-logo">
+            <span class="logo-icon">🛍️</span>
+            <span class="logo-text">Marketplace</span>
+          </a>
+          <h1 class="auth-title">Create Account</h1>
+          <p class="auth-subtitle">Start selling or buying today</p>
+        </div>
+
+        <form class="auth-form" id="registerForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName" class="form-label">First Name *</label>
+              <input
+                type="text"
+                id="firstName"
+                class="form-input"
+                placeholder="John"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="lastName" class="form-label">Last Name *</label>
+              <input
+                type="text"
+                id="lastName"
+                class="form-input"
+                placeholder="Doe"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="username" class="form-label">Username *</label>
+            <input
+              type="text"
+              id="username"
+              class="form-input"
+              placeholder="johndoe"
+              required
+            />
+            <small class="form-hint">This will be your unique identifier</small>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address *</label>
+            <input
+              type="email"
+              id="email"
+              class="form-input"
+              placeholder="name@example.com"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="role" class="form-label">Account Type *</label>
+            <select id="role" class="form-input" required>
+              <option value="">Select account type</option>
+              <option value="seller">Seller</option>
+              <option value="buyer">Buyer</option>
+            </select>
+            <small class="form-hint"
+              >Sellers need admin approval to start selling</small
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">Password *</label>
+            <div class="password-input">
+              <input
+                type="password"
+                id="password"
+                class="form-input"
+                placeholder="Min. 8 characters"
+                required
+                minlength="8"
+              />
+              <button type="button" class="password-toggle" id="togglePassword">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  />
+                  <path
+                    d="M1.66675 10C1.66675 10 4.16675 4.16667 10.0001 4.16667C15.8334 4.16667 18.3334 10 18.3334 10C18.3334 10 15.8334 15.8333 10.0001 15.8333C4.16675 15.8333 1.66675 10 1.66675 10Z"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword" class="form-label"
+              >Confirm Password *</label
+            >
+            <div class="password-input">
+              <input
+                type="password"
+                id="confirmPassword"
+                class="form-input"
+                placeholder="Re-enter password"
+                required
+                minlength="8"
+              />
+              <button
+                type="button"
+                class="password-toggle"
+                id="toggleConfirmPassword"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  />
+                  <path
+                    d="M1.66675 10C1.66675 10 4.16675 4.16667 10.0001 4.16667C15.8334 4.16667 18.3334 10 18.3334 10C18.3334 10 15.8334 15.8333 10.0001 15.8333C4.16675 15.8333 1.66675 10 1.66675 10Z"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <label class="checkbox-label">
+              <input type="checkbox" id="terms" required />
+              <span
+                >I agree to the
+                <a href="#" class="link">Terms of Service</a> and
+                <a href="#" class="link">Privacy Policy</a></span
+              >
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-primary btn-block"
+            id="submitBtn"
+          >
+            <span class="btn-text">Create Account</span>
+            <span class="btn-loader" style="display: none">
+              <div class="spinner-small"></div>
+            </span>
+          </button>
+
+          <div class="alert" id="alert" style="display: none"></div>
+        </form>
+
+        <div class="auth-footer">
+          <p>
+            Already have an account? <a href="login.html" class="link">Login</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config/supabase.js"></script>
+    <script src="js/utils/auth.js"></script>
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/pages/register.js"></script>
+  </body>
+</html>

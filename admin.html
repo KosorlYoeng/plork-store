@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="index.html" class="logo">
+                    <span class="logo-icon">🛍️</span>
+                    <span class="logo-text">Marketplace</span>
+                </a>
+                
+                <div class="nav-links" id="navLinks">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="dashboard.html" class="nav-link">Dashboard</a>
+                    <a href="admin.html" class="nav-link active">Admin Panel</a>
+                </div>
+
+                <div class="nav-actions" id="navActions">
+                    <div class="user-menu" id="userMenu">
+                        <button class="user-button" id="userButton">
+                            <span class="user-avatar" id="userAvatar">A</span>
+                            <span class="user-name" id="userName">Admin</span>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="dashboard.html" class="dropdown-item">Dashboard</a>
+                            <button class="dropdown-item" id="logoutBtn">Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Container -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Admin Panel</h2>
+                <p class="user-role" style="color: #ef4444;">Administrator</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#overview" class="sidebar-link active" data-section="overview">
+                    <span class="sidebar-icon">📊</span>
+                    Overview
+                </a>
+                <a href="#sellers" class="sidebar-link" data-section="sellers">
+                    <span class="sidebar-icon">👥</span>
+                    Manage Sellers
+                </a>
+                <a href="#products" class="sidebar-link" data-section="products">
+                    <span class="sidebar-icon">📦</span>
+                    All Products
+                </a>
+                <a href="#users" class="sidebar-link" data-section="users">
+                    <span class="sidebar-icon">👤</span>
+                    All Users
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Overview Section -->
+            <section class="dashboard-section active" id="overview">
+                <div class="section-header">
+                    <h1>Admin Overview</h1>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #dbeafe; color: #3b82f6;">👥</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Total Users</div>
+                            <div class="stat-value" id="totalUsersStat">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #fef3c7; color: #f59e0b;">🏪</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Active Sellers</div>
+                            <div class="stat-value" id="activeSellers Stat">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #ede9fe; color: #8b5cf6;">⏳</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Pending Approvals</div>
+                            <div class="stat-value" id="pendingSellersStat">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #d1fae5; color: #10b981;">📦</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Total Products</div>
+                            <div class="stat-value" id="totalProductsStat">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Sellers -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Pending Seller Approvals</h2>
+                        <span class="status-badge status-pending" id="pendingCount">0</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Username</th>
+                                        <th>Phone</th>
+                                        <th>Registered</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingSellersTable">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sellers Section -->
+            <section class="dashboard-section" id="sellers">
+                <div class="section-header">
+                    <h1>Manage Sellers</h1>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-bar">
+                    <input type="search" id="searchSellers" class="search-input" placeholder="Search sellers...">
+                    <select id="filterSellerStatus" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="suspended">Suspended</option>
+                    </select>
+                </div>
+
+                <!-- Sellers Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Username</th>
+                                        <th>Phone</th>
+                                        <th>Products</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sellersTable">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Section -->
+            <section class="dashboard-section" id="products">
+                <div class="section-header">
+                    <h1>All Products</h1>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-bar">
+                    <input type="search" id="searchProducts" class="search-input" placeholder="Search products...">
+                    <select id="filterCategory" class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Home">Home & Garden</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Books">Books</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <select id="filterProductStatus" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="available">Available</option>
+                        <option value="soldout">Sold Out</option>
+                    </select>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="products-grid" id="allProductsGrid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading products...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section class="dashboard-section" id="users">
+                <div class="section-header">
+                    <h1>All Users</h1>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-bar">
+                    <input type="search" id="searchUsers" class="search-input" placeholder="Search users...">
+                    <select id="filterUserRole" class="filter-select">
+                        <option value="">All Roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="seller">Seller</option>
+                        <option value="buyer">Buyer</option>
+                    </select>
+                </div>
+
+                <!-- Users Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Username</th>
+                                        <th>Phone</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Joined</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTable">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config/supabase.js"></script>
+    <script src="js/utils/auth.js"></script>
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/components/navbar.js"></script>
+    <script src="js/pages/admin.js"></script>
+</body>
+</html>
