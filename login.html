@@ -107,7 +107,17 @@
       </div>
     </div>
 
+    <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Backup CDN if jsdelivr fails -->
+    <script>
+      if (typeof window.supabase === "undefined") {
+        document.write(
+          '<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>',
+        );
+      }
+    </script>
+
     <script src="config/supabase.js"></script>
     <script src="js/utils/auth.js"></script>
     <script src="js/utils/helpers.js"></script>
